@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./back-end   
+      dockerfile: Dockerfile     
+    container_name: back-end-POC
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - keycloak
+      - postgres
+    volumes:
+      - ./back-end:/app
+    networks:
+      - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak-POC
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8080:8080"
+    command: ["start-dev"]
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - app-network
+
+  angular-app:
+    build:
+      context: ./front-end  
+      dockerfile: Dockerfile 
+    container_name: angular-app-POC
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./front-end:/app
+    working_dir: /app
+    command: ["tail", "-f", "/dev/null"]  
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pocdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  pgdata:
