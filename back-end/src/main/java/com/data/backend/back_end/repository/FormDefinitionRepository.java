@@ -7,5 +7,5 @@ import com.data.backend.back_end.model.FormDefinition;
 
 public interface FormDefinitionRepository extends JpaRepository<FormDefinition, String> {
 
-    List<FormDefinition> findByAllowedRole(String role);
+    List<FormDefinition> findByAllowedRole(String allowedRole);
 }

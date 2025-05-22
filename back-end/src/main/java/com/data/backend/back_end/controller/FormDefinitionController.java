@@ -48,17 +48,8 @@ public class FormDefinitionController {
     }
 
     @GetMapping("/getForms")
-    public List<FormDefinition> getFormsByRole() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getAuthorities().isEmpty()) {
-            return List.of(); // Aucun formulaire si pas d'auth
-        }
-
-        // On suppose un seul rôle
-        GrantedAuthority authority = auth.getAuthorities().iterator().next();
-        String role = authority.getAuthority().replace("ROLE_", ""); // Ex: "admin", "manager"
-
-        return formRepository.findByAllowedRole(role);
+    public List<FormDefinition> getForms() {
+        return formRepository.findAll();
     }
 
     @GetMapping("/getFormByName")
@@ -154,4 +145,12 @@ public class FormDefinitionController {
             return ResponseEntity.internalServerError().body("Erreur : " + e.getMessage());
         }
     }
+
+    @GetMapping("/getFormsByRole")
+    public List<FormDefinition> getFormsByRole(@RequestParam String role) {
+        return formRepository.findAll().stream()
+                .filter(form -> role.equals(form.getAllowedRole()))
+                .toList();
+    }
+
 }
