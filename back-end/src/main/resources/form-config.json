@@ -1,6 +1,13 @@
 {
     "title": "Formulaire d'inscription",
+    "primaryKey": ["cle"],
     "fields": [
+      {
+        "name": "cle",
+        "label": "cle",
+        "type": "text",
+        "required": false
+      },
       {
         "name": "nom",
         "label": "Nom",
@@ -19,6 +26,7 @@
         "type": "number",
         "required": false
       }
+      
     ]
   }
   
